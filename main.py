@@ -161,18 +161,35 @@ async def help_command(ctx):
 
 @bot.command(name="lock")
 @commands.has_permissions(manage_channels=True)
-async def lock_channel(ctx):
-    await ctx.message.delete()
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send("🔒 **Ce salon a été verrouillé par la modération.**")
+async def lock_cmd(ctx, cible: str = None):
+    if cible == "all":
+        message = await ctx.send("🔒 Verrouillage global en cours (ça peut prendre quelques secondes)...")
+        for channel in ctx.guild.text_channels:
+            try:
+                # Modifie la permission pour empêcher d'envoyer des messages
+                await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+            except Exception:
+                pass # Ignore les salons où Rikka n'a pas accès
+        await message.edit(content="✅ **Tous** les salons textuels ont été verrouillés.")
+    else:
+        await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
+        await ctx.send("🔒 Ce salon a été verrouillé.")
 
 @bot.command(name="unlock")
 @commands.has_permissions(manage_channels=True)
-async def unlock_channel(ctx):
-    await ctx.message.delete()
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=None)
-    await ctx.send("🔓 **Le salon est déverrouillé.**")
-
+async def unlock_cmd(ctx, cible: str = None):
+    if cible == "all":
+        message = await ctx.send("🔓 Déverrouillage global en cours...")
+        for channel in ctx.guild.text_channels:
+            try:
+                # "None" remet la permission à zéro (par défaut)
+                await channel.set_permissions(ctx.guild.default_role, send_messages=None)
+            except Exception:
+                pass
+        await message.edit(content="✅ **Tous** les salons textuels ont été déverrouillés.")
+    else:
+        await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=None)
+        await ctx.send("🔓 Ce salon a été déverrouillé.")
 @bot.command(name="clear")
 @commands.has_permissions(manage_messages=True)
 async def clear_messages(ctx, amount: int = 5):
