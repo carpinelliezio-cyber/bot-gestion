@@ -214,6 +214,29 @@ async def unmute_member(ctx, member: discord.Member):
     await member.timeout(None, reason="Unmute manuel")
     await ctx.send(f"🔊 Le mute de **{member.name}** a été annulé.")
 
+@bot.command(name="nukeall")
+@commands.has_permissions(administrator=True)
+async def nukeall_cmd(ctx):
+    # Sécurité ultime : Seul le propriétaire du serveur a le droit
+    if ctx.author.id != ctx.guild.owner_id:
+        return await ctx.send("❌ **Accès Refusé** : Seul le propriétaire du serveur peut détruire tous les salons.")
+    
+    await ctx.send("⚠️ **ALERTE ROUGE** : Suppression de TOUS les salons dans 5 secondes...")
+    await asyncio.sleep(5)
+    
+    # Parcourt et supprime les salons vocaux, textuels et les catégories
+    for channel in ctx.guild.channels:
+        try:
+            await channel.delete()
+        except Exception:
+            pass
+            
+    # Rikka recrée un salon de base à la fin pour que le serveur ne soit pas mort
+    try:
+        await ctx.guild.create_text_channel("général")
+    except Exception:
+        pass
+
 @bot.command(name="kick")
 @commands.has_permissions(kick_members=True)
 async def kick_member(ctx, member: discord.Member, *, reason="Raison non spécifiée"):
