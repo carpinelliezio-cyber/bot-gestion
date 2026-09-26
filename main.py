@@ -217,4 +217,4 @@ async def ban_member(ctx, member: discord.Member, *, reason="Raison non spécifi
 # ==========================================
 # LANCEMENT
 # ==========================================
-bot.run(os.getenv("DISCORD_TOKEN") or "TON_TOKEN_ICI")
+bot.run(os.getenv("DISCORD_TOKEN") or "MTU1MzQwMjY3MDM3NzYwMzE4Mg.GJBxH4.F9CdGvE0zIPQ8BtvVAJYBb97ux7QBw9fEYeiCw")
