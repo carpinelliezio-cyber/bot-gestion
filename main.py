@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import re
+from keep_alive import keep_alive
 import asyncio
 from datetime import timedelta, datetime
 import collections
@@ -217,5 +218,6 @@ async def ban_member(ctx, member: discord.Member, *, reason="Raison non spécifi
 # ==========================================
 # LANCEMENT
 # ==========================================
+keep_alive()
 bot.run(os.getenv("DISCORD_TOKEN"))
 
