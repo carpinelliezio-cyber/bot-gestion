@@ -214,6 +214,32 @@ async def ban_member(ctx, member: discord.Member, *, reason="Raison non spécifi
         return await ctx.send("❌ Impossible de sanctionner ce membre.", delete_after=3)
     await member.ban(reason=reason, delete_message_days=1)
     await ctx.send(f"🔨 **{member.name}** a été banni. (Raison : {reason})")
+   
+    LOG_CHANNEL_ID = 1551286203876122804
+
+@bot.event
+async def on_guild_join(guild):
+    channel = bot.get_channel(LOG_CHANNEL_ID)
+    if channel:
+        embed = discord.Embed(
+            title="🛡️ Rikka Gestion Ajoutée !",
+            description=f"Le bot de sécurité a rejoint le serveur **{guild.name}**.",
+            color=discord.Color.green()
+        )
+        embed.add_field(name="Membres", value=str(guild.member_count), inline=True)
+        embed.add_field(name="Propriétaire", value=f"<@{guild.owner_id}>", inline=True)
+        await channel.send(embed=embed)
+
+@bot.event
+async def on_guild_remove(guild):
+    channel = bot.get_channel(LOG_CHANNEL_ID)
+    if channel:
+        embed = discord.Embed(
+            title="🔴 Rikka Gestion Retirée",
+            description=f"Le bot de sécurité a été retiré du serveur **{guild.name}**.",
+            color=discord.Color.red()
+        )
+        await channel.send(embed=embed)
 
 # ==========================================
 # LANCEMENT
