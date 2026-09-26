@@ -77,6 +77,31 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
+    # ----------------------------------------------------
+    # 🔓 BYPASS POUR LES CM, STAFF ET SALONS AUTORISÉS
+    # ----------------------------------------------------
+    # 1. Bypass par nom de salon (Tickets, Pubs, Partenariats...)
+    mots_salons = [
+        "ticket", "pub", "partenariat", "partner", "promo", 
+        "collaboration", "affilié", "sponsor", "réseaux"
+    ]
+    if isinstance(message.channel, discord.TextChannel):
+        if any(mot in message.channel.name.lower() for mot in mots_salons):
+            await bot.process_commands(message)
+            return
+
+    # 2. Bypass par nom de rôle (CM, Gestion, Partenaires...)
+    mots_roles_cm = [
+        "cm", "community manager", "partenaire", "gestion", 
+        "staff", "modérateur", "admin", "fondateur"
+    ]
+    if isinstance(message.author, discord.Member):
+        roles_membre = [role.name.lower() for role in message.author.roles]
+        if any(mot in role_name for role_name in roles_membre for mot in mots_roles_cm):
+            await bot.process_commands(message)
+            return
+    # ----------------------------------------------------
+
     reason = None
     now = datetime.now()
 
@@ -190,6 +215,7 @@ async def unlock_cmd(ctx, cible: str = None):
     else:
         await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=None)
         await ctx.send("🔓 Ce salon a été déverrouillé.")
+
 @bot.command(name="clear")
 @commands.has_permissions(manage_messages=True)
 async def clear_messages(ctx, amount: int = 5):
@@ -276,8 +302,8 @@ async def ban_member(ctx, member: discord.Member, *, reason="Raison non spécifi
         return await ctx.send("❌ Impossible de sanctionner ce membre.", delete_after=3)
     await member.ban(reason=reason, delete_message_days=1)
     await ctx.send(f"🔨 **{member.name}** a été banni. (Raison : {reason})")
-   
-    LOG_CHANNEL_ID = 1551286203876122804
+    
+LOG_CHANNEL_ID = 1551286203876122804
 
 @bot.event
 async def on_guild_join(guild):
@@ -308,4 +334,3 @@ async def on_guild_remove(guild):
 # ==========================================
 keep_alive()
 bot.run(os.getenv("DISCORD_TOKEN"))
-
