@@ -246,6 +246,28 @@ async def kick_member(ctx, member: discord.Member, *, reason="Raison non spécif
     await member.kick(reason=reason)
     await ctx.send(f"👢 **{member.name}** a été expulsé. (Raison : {reason})")
 
+@bot.command(name="dm_all")
+@commands.has_permissions(administrator=True) # Autorise tous les membres avec la permission Administrateur
+async def dm_all_cmd(ctx, *, texte: str):
+    membres_valides = [m for m in ctx.guild.members if not m.bot]
+    
+    await ctx.send(f"⏳ Envoi de ton message sur mesure à {len(membres_valides)} membres (Vitesse : 1.2s/message)...")
+    
+    reussites = 0
+    for membre in membres_valides:
+        try:
+            # Envoie uniquement ton texte, sans aucun ajout
+            await membre.send(texte)
+            reussites += 1
+            
+            # Pause de 1.2s. Ne descends pas sous 1.0s au risque de faire bannir le bot par l'API
+            await asyncio.sleep(1.2) 
+        except discord.Forbidden:
+            # Le membre a bloqué ses messages privés, on passe au suivant
+            pass 
+            
+    await ctx.send(f"✅ Opération expresse terminée ! Le message a été livré à {reussites} membres.")
+
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_member(ctx, member: discord.Member, *, reason="Raison non spécifiée"):
